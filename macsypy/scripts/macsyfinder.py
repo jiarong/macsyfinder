@@ -487,7 +487,7 @@ def search_systems(config, model_registry, models_def_to_detect, logger):
 
     parser.parse(models_def_to_detect)
 
-    logger.info(f"MacSyFinder's results will be stored in working_dir{working_dir}")
+    logger.info(f"MacSyFinder's results will be stored in working_dir: {working_dir}")
     logger.info(f"Analysis launched on {config.sequence_db()} for model(s):")
 
     for m in models_def_to_detect:
@@ -811,13 +811,12 @@ def summary_best_solution(best_solution_path, sys_file, models_fqn, replicon_nam
     print(_outfile_header(), file=sys_file)
 
     def fill_replicon(summary):
-        index_name = summary.index.name
         computed_replicons = set(summary.index)
         lacking_replicons = set(replicon_names) - computed_replicons
         lacking_replicons = sorted(lacking_replicons)
-        rows = pd.DataFrame({models: [0 * len(lacking_replicons)] for models in summary.columns}, index=lacking_replicons)
-        summary = pd.concat([summary, rows], ignore_index=False)
-        summary.index.name = index_name
+        for rep in lacking_replicons:
+            row = pd.Series({m: 0 for m in summary.columns}, name=rep)
+            summary = summary.append(row)
         return summary
 
     def fill_models(summary):
@@ -1053,6 +1052,8 @@ def main(args=None, loglevel=None):
 
     try:
         models_def_to_detect = get_def_to_detect(config.models(), model_registry)
+        print(config.models())
+        print(models_def_to_detect)
     except KeyError as err:
         sys.exit(f"macsyfinder: {err}")
 

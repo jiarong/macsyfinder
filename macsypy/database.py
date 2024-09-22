@@ -340,6 +340,7 @@ class RepliconDB:
         for replicon in replicons:
             genes = []
             seq_id, seq_length, _min = next(replicon)
+            _max = _min
 
             replicon_name, seq_name = parse_seq_id(seq_id)
             genes.append((seq_name, seq_length))
@@ -347,13 +348,14 @@ class RepliconDB:
                 # pass all sequence of the replicon until the last one
                 _, seq_name = parse_seq_id(seq_id)
                 genes.append((seq_name, seq_length))
-            _, seq_name = parse_seq_id(seq_id)
-            try:
                 _max = rank
-            except UnboundLocalError:
-                msg = f"Error during sequence-db '{self.cfg.sequence_db()}' parsing. Are you sure db-type is 'gembase'?"
-                _log.critical(msg)
-                raise MacsypyError(msg) from None
+            _, seq_name = parse_seq_id(seq_id)
+            #try:
+            #    _max = rank
+            #except UnboundLocalError:
+            #    msg = f"Error during sequence-db '{self.cfg.sequence_db()}' parsing. Are you sure db-type is 'gembase'?"
+            #    _log.critical(msg)
+            #    raise MacsypyError(msg) from None
             genes.append((seq_name, seq_length))
             if replicon_name in topology:
                 self._DB[replicon_name] = RepliconInfo(topology[replicon_name], _min, _max, genes)
